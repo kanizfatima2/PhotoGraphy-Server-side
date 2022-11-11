@@ -27,26 +27,7 @@ async function run() {
     const newService = client.db('PhotographyService').collection('newService')
     try {
 
-        // get all Services 
-        app.get('/services', async (req, res) => {
-            try {
-                const cursor = Service.find({})
-                const services = await cursor.toArray();
 
-                res.send({
-                    success: true,
-                    message: 'Successfully read the data!',
-                    data: services
-                })
-            }
-            catch (error) {
-                console.log(error.message);
-                res.send({
-                    success: false,
-                    error: error.message
-                })
-            }
-        })
 
         //Read One Service
         app.get('/services/:id', async (req, res) => {
