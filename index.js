@@ -131,7 +131,39 @@ async function run() {
 
         })
 
+        //Delete Reviews
+        app.delete('/reviews/:id', async (req, res) => {
+            const { id } = req.params;
+            try {
+                const reviews = await Reviews.findOne({ _id: ObjectId(id) })
 
+                //Review does not exist
+                if (!reviews?._id) {
+                    res.send({
+                        success: false,
+                        error: "No Review",
+                    });
+                    return;
+                }
+
+                //Review Exist
+                const result = await Reviews.deleteOne({ _id: ObjectId(id) });
+
+                if (result.deletedCount) {
+                    res.send({
+                        success: true,
+                        message: `Successfully deleted the ${reviews.title}`,
+                    });
+                }
+            }
+
+            catch (error) {
+                res.send({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        })
 
 
     }
