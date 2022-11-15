@@ -69,19 +69,48 @@ async function run() {
             }
         })
 
+        //Read added Service
+        app.get('/newService', async (req, res) => {
+            let query = {};
+
+
+            try {
+                if (req.query.email) {
+                    query = {
+                        email: req.query.email
+                    }
+                }
+                const cursor = newService.find(query);
+                const newservice = await cursor.toArray();
+                res.send({
+                    success: true,
+                    message: 'Successfully read all service',
+                    data: newservice
+                })
+            }
+            catch (error) {
+                console.log(error.message);
+                res.send({
+                    success: false,
+                    error: error.message
+                })
+            }
+
+        })
+
         //Create Reviews
         app.post('/reviews', async (req, res) => {
             const result = await Reviews.insertOne(req.body)
             if (result.insertedId) {
                 res.send({
                     success: true,
-                    message: 'Succesfully placed the order!!'
+                    message: 'Succesfully added your Review!!'
                 })
             }
             else {
                 res.send({
                     success: false,
-                    error: 'could not place the order!'
+                    error: 'Your attempt is failed!'
                 })
             }
         })
@@ -91,13 +120,13 @@ async function run() {
             if (result.insertedId) {
                 res.send({
                     success: true,
-                    message: 'Succesfully placed the order!!'
+                    message: 'Succesfully Booked your Package!!'
                 })
             }
             else {
                 res.send({
                     success: false,
-                    error: 'could not place the order!'
+                    error: 'Your Attempt is failed!'
                 })
             }
         })
@@ -113,6 +142,7 @@ async function run() {
                         email: req.query.email
                     }
                 }
+
                 const cursor = Reviews.find(query);
                 const reviews = await cursor.toArray();
                 res.send({
@@ -164,6 +194,79 @@ async function run() {
                 });
             }
         })
+
+        //Read each Service reviews
+        app.get('/reviews/:id', async (req, res) => {
+            const { id } = req.params;
+            try {
+
+                const query = { service: id }
+                const cursor = Reviews.find(query);
+                const single_Review = await cursor.toArray();
+                res.send({
+                    success: true,
+                    message: 'Successfully read all package reviews',
+                    data: single_Review
+                })
+            }
+            catch (error) {
+                console.log(error.message);
+                res.send({
+                    success: false,
+                    error: error.message
+                })
+            }
+
+        })
+
+        //Update Review
+        //step 1: get the data 
+        app.get('/reviews/:id', async (req, res) => {
+            try {
+                const { id } = (req.params);
+                const edit_review = await Reviews.findOne({ _id: ObjectId(id) })
+                res.send({
+                    success: true,
+                    data: edit_review
+                })
+
+            }
+            catch (error) {
+                res.send({
+                    success: false,
+                    error: error.message
+                })
+            }
+        })
+
+        //Step 2: Update the Data
+        app.patch('/reviews/:id', async (req, res) => {
+            const { id } = (req.params);
+            const options = { upsert: true };
+            try {
+                const result = await Reviews.updateOne({ _id: ObjectId(id) }, { $set: req.body }, options)
+                if (result.matchedCount) {
+                    res.send({
+                        success: true,
+                        message: 'Successfully Updated'
+                    })
+                }
+                else {
+                    res.send({
+                        success: false,
+                        error: 'Could not updated!'
+                    })
+                }
+
+            }
+            catch (error) {
+                res.send({
+                    success: false,
+                    error: error.message
+                })
+            }
+        })
+
 
 
     }
